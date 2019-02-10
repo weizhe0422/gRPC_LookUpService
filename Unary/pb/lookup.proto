@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package lookup;
+
+option go_package = "pb";
+
+message LookingUp {
+    string first_name = 1;
+    string last_name = 2;
+}
+
+message LookUpRequest {
+    LookingUp lookingUp = 1;
+}
+
+message LookUpResponse {
+    int32 result = 1;
+}
+
+service LookUpService{
+    //unary
+    rpc LookUp(LookUpRequest) returns (LookUpResponse) {};
+}
