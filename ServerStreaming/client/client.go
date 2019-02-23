@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/weizhe0422/gRPC_LookUpService/ServerStreaming/pb"
+	"github.com/weizhe0422/gRPC_LookUpService/pb"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"io"

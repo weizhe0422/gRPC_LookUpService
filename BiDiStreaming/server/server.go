@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/weizhe0422/gRPC_LookUpService/pb"
 	"google.golang.org/grpc"
+	"io"
 	"log"
 	"net"
 	"time"
@@ -73,7 +74,7 @@ func (s *serviceSvr) LookUpServerStreaming(req *pb.LookUpRequest, stream pb.Look
 		lookUpResp *pb.LookUpResponse
 		content    MyDataTable
 		result     int32
-		idx int
+		idx        int
 	)
 
 	log.Printf("LookUp function invoked by %v", req)
@@ -93,7 +94,7 @@ func (s *serviceSvr) LookUpServerStreaming(req *pb.LookUpRequest, stream pb.Look
 		return errors.New("failed to find ID, please check first name again")
 	}
 
-	for idx = 1; idx < 10; idx++{
+	for idx = 1; idx < 10; idx++ {
 		lookUpResp = &pb.LookUpResponse{
 			Result: result,
 		}
@@ -102,6 +103,55 @@ func (s *serviceSvr) LookUpServerStreaming(req *pb.LookUpRequest, stream pb.Look
 	}
 
 	return nil
+}
+
+func (s *serviceSvr) BiDiLookUp(stream pb.LookUpService_BiDiLookUpServer) (err error) {
+	var (
+		firstName  string
+		lookUpResq *pb.LookUpRequest
+		sendErr    error
+	)
+
+	log.Printf("BiDiLookUp function invoked")
+	log.Println(recordTable)
+
+	for {
+		lookUpResq, err = stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("failed to receive the message from client: %v", err)
+		}
+		firstName = lookUpResq.LookingUp.FirstName
+		lookUpFromDataTable(firstName)
+
+		sendErr = stream.Send(&pb.LookUpResponse{
+			Result: lookUpFromDataTable(firstName),
+		})
+
+		if sendErr != nil {
+			log.Fatalf("failed while sending data to client %v", sendErr)
+			return sendErr
+		}
+	}
+
+	return nil
+}
+
+func lookUpFromDataTable(firstName string) int32 {
+	var (
+		content MyDataTable
+	)
+
+	for _, content = range recordTable {
+		log.Println(content.Name, "/", firstName)
+		if content.Name == firstName {
+			return content.ID
+		}
+	}
+
+	return -1
 }
 
 func InitGRPCSvr() (err error) {
