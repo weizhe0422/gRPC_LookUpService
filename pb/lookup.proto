@@ -23,4 +23,10 @@ service LookUpService{
 
     //ServerStreaming
     rpc LookUpServerStreaming(LookUpRequest) returns (stream LookUpResponse){};
+
+    //BiDiStreaming
+    rpc BiDiLookUp(stream LookUpRequest) returns (stream LookUpResponse){};
+
+    //unary with deadline
+    rpc LookUpWithDeadline(LookUpRequest) returns (LookUpResponse) {};
 }

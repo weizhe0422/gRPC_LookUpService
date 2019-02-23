@@ -1,3 +1,3 @@
 #!bin/bash
 
-protoc Lookupservice/ServerStreaming/pb/lookup.proto --go_out=plugins=grpc:.
+protoc gRPC_Lookupservice/pb/lookup.proto --go_out=plugins=grpc:.
